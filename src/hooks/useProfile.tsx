@@ -43,7 +43,7 @@ export const useProfile = () => {
     }
   };
 
-  const updateProfile = async (updates: Partial<UserProfile>) => {
+  const updateProfile = async (updates: Partial<Omit<UserProfile, 'id' | 'email' | 'created_at' | 'updated_at'>>) => {
     if (!user || !profile) return;
 
     try {

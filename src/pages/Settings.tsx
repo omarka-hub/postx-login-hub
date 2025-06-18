@@ -9,33 +9,21 @@ import { Separator } from '@/components/ui/separator';
 import { useProfile } from '@/hooks/useProfile';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Eye, EyeOff, User, Mail, Crown } from 'lucide-react';
+import { User, Mail, Crown } from 'lucide-react';
 
 const Settings = () => {
   const { profile, loading, updateProfile } = useProfile();
   const { toast } = useToast();
-  const [showPasswordForm, setShowPasswordForm] = useState(false);
-  const [passwordData, setPasswordData] = useState({
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: ''
-  });
-  const [showPasswords, setShowPasswords] = useState({
-    current: false,
-    new: false,
-    confirm: false
-  });
   const [isUpdating, setIsUpdating] = useState(false);
+  const [isSendingReset, setIsSendingReset] = useState(false);
   const [profileData, setProfileData] = useState({
-    full_name: profile?.full_name || '',
-    email: profile?.email || ''
+    full_name: profile?.full_name || ''
   });
 
   React.useEffect(() => {
     if (profile) {
       setProfileData({
-        full_name: profile.full_name || '',
-        email: profile.email || ''
+        full_name: profile.full_name || ''
       });
     }
   }, [profile]);
@@ -56,49 +44,36 @@ const Settings = () => {
     setIsUpdating(false);
   };
 
-  const handlePasswordChange = async () => {
-    if (passwordData.newPassword !== passwordData.confirmPassword) {
+  const handlePasswordReset = async () => {
+    if (!profile?.email) {
       toast({
         title: "Error",
-        description: "New passwords do not match",
+        description: "Email address not found",
         variant: "destructive"
       });
       return;
     }
 
-    if (passwordData.newPassword.length < 6) {
-      toast({
-        title: "Error",
-        description: "Password must be at least 6 characters long",
-        variant: "destructive"
-      });
-      return;
-    }
-
+    setIsSendingReset(true);
     try {
-      const { error } = await supabase.auth.updateUser({
-        password: passwordData.newPassword
+      const { error } = await supabase.auth.resetPasswordForEmail(profile.email, {
+        redirectTo: `${window.location.origin}/settings`
       });
 
       if (error) throw error;
 
       toast({
-        title: "Success",
-        description: "Password updated successfully"
+        title: "Password Reset Email Sent",
+        description: "Check your email for a password reset link"
       });
-
-      setPasswordData({
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: ''
-      });
-      setShowPasswordForm(false);
     } catch (error: any) {
       toast({
         title: "Error",
-        description: error.message || "Failed to update password",
+        description: error.message || "Failed to send password reset email",
         variant: "destructive"
       });
+    } finally {
+      setIsSendingReset(false);
     }
   };
 
@@ -148,7 +123,10 @@ const Settings = () => {
             </div>
             <div className="flex-1">
               <h3 className="font-semibold">{profile.full_name || 'No name set'}</h3>
-              <p className="text-sm text-muted-foreground">{profile.email}</p>
+              <p className="text-sm text-muted-foreground flex items-center gap-1">
+                <Mail className="w-3 h-3" />
+                {profile.email}
+              </p>
             </div>
             <Badge className={getAccessLevelColor(profile.access_level)}>
               <Crown className="w-3 h-3 mr-1" />
@@ -156,7 +134,7 @@ const Settings = () => {
             </Badge>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="full_name">Full Name</Label>
               <Input
@@ -166,15 +144,17 @@ const Settings = () => {
                 placeholder="Enter your full name"
               />
             </div>
+
             <div className="space-y-2">
-              <Label htmlFor="email">Email Address</Label>
+              <Label>Email Address</Label>
               <Input
-                id="email"
-                type="email"
-                value={profileData.email}
-                onChange={(e) => setProfileData(prev => ({ ...prev, email: e.target.value }))}
-                placeholder="Enter your email"
+                value={profile.email || ''}
+                disabled
+                className="bg-muted cursor-not-allowed"
               />
+              <p className="text-xs text-muted-foreground">
+                Email address cannot be changed for security reasons
+              </p>
             </div>
           </div>
 
@@ -194,76 +174,21 @@ const Settings = () => {
           <CardTitle>Account Security</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {!showPasswordForm ? (
-            <div className="flex items-center justify-between p-4 border rounded-lg">
-              <div>
-                <h4 className="font-medium">Password</h4>
-                <p className="text-sm text-muted-foreground">Change your account password</p>
-              </div>
-              <Button variant="outline" onClick={() => setShowPasswordForm(true)}>
-                Change Password
-              </Button>
+          <div className="flex items-center justify-between p-4 border rounded-lg">
+            <div>
+              <h4 className="font-medium">Password</h4>
+              <p className="text-sm text-muted-foreground">
+                Send a secure password reset link to your email
+              </p>
             </div>
-          ) : (
-            <div className="space-y-4 p-4 border rounded-lg">
-              <div className="flex items-center justify-between">
-                <h4 className="font-medium">Change Password</h4>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={() => setShowPasswordForm(false)}
-                >
-                  Cancel
-                </Button>
-              </div>
-
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="newPassword">New Password</Label>
-                  <div className="relative">
-                    <Input
-                      id="newPassword"
-                      type={showPasswords.new ? 'text' : 'password'}
-                      value={passwordData.newPassword}
-                      onChange={(e) => setPasswordData(prev => ({ ...prev, newPassword: e.target.value }))}
-                      placeholder="Enter new password"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPasswords(prev => ({ ...prev, new: !prev.new }))}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                    >
-                      {showPasswords.new ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    </button>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="confirmPassword">Confirm New Password</Label>
-                  <div className="relative">
-                    <Input
-                      id="confirmPassword"
-                      type={showPasswords.confirm ? 'text' : 'password'}
-                      value={passwordData.confirmPassword}
-                      onChange={(e) => setPasswordData(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                      placeholder="Confirm new password"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPasswords(prev => ({ ...prev, confirm: !prev.confirm }))}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                    >
-                      {showPasswords.confirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    </button>
-                  </div>
-                </div>
-
-                <Button onClick={handlePasswordChange} className="w-full">
-                  Update Password
-                </Button>
-              </div>
-            </div>
-          )}
+            <Button 
+              variant="outline" 
+              onClick={handlePasswordReset}
+              disabled={isSendingReset}
+            >
+              {isSendingReset ? 'Sending...' : 'Reset Password'}
+            </Button>
+          </div>
         </CardContent>
       </Card>
 
