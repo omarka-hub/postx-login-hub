@@ -74,9 +74,7 @@ const SignUp = () => {
         <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
           {/* Header */}
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-xl mb-4">
-              <span className="text-2xl font-bold text-white px-0 py-0 my-0">PostX</span>
-            </div>
+            
             <h1 className="text-2xl font-bold text-gray-900 mb-2">Create your account</h1>
             <p className="text-gray-600">Join PostX and start your journey</p>
           </div>
