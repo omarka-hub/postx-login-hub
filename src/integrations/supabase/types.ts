@@ -63,6 +63,39 @@ export type Database = {
         }
         Relationships: []
       }
+      rss_feeds: {
+        Row: {
+          created_at: string
+          feed_type: string
+          id: string
+          is_x_source: boolean
+          name: string
+          updated_at: string
+          url: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          feed_type: string
+          id?: string
+          is_x_source?: boolean
+          name: string
+          updated_at?: string
+          url: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          feed_type?: string
+          id?: string
+          is_x_source?: boolean
+          name?: string
+          updated_at?: string
+          url?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       x_credentials: {
         Row: {
           access_token: string
