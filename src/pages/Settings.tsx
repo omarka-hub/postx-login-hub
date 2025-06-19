@@ -1,32 +1,13 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { useProfile } from '@/hooks/useProfile';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
-import { User, Mail, Crown } from 'lucide-react';
+import { User, Crown, Calendar, Clock } from 'lucide-react';
 
 const Settings = () => {
-  const { profile, loading, updateProfile } = useProfile();
-  const { toast } = useToast();
-  const [isUpdating, setIsUpdating] = useState(false);
-  const [isSendingReset, setIsSendingReset] = useState(false);
-  const [profileData, setProfileData] = useState({
-    full_name: profile?.full_name || ''
-  });
-
-  React.useEffect(() => {
-    if (profile) {
-      setProfileData({
-        full_name: profile.full_name || ''
-      });
-    }
-  }, [profile]);
+  const { profile, loading } = useProfile();
 
   const getAccessLevelColor = (level: string) => {
     switch (level) {
@@ -38,43 +19,14 @@ const Settings = () => {
     }
   };
 
-  const handleProfileUpdate = async () => {
-    setIsUpdating(true);
-    await updateProfile(profileData);
-    setIsUpdating(false);
-  };
-
-  const handlePasswordReset = async () => {
-    if (!profile?.email) {
-      toast({
-        title: "Error",
-        description: "Email address not found",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setIsSendingReset(true);
-    try {
-      const { error } = await supabase.auth.resetPasswordForEmail(profile.email, {
-        redirectTo: `${window.location.origin}/settings`
-      });
-
-      if (error) throw error;
-
-      toast({
-        title: "Password Reset Email Sent",
-        description: "Check your email for a password reset link"
-      });
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to send password reset email",
-        variant: "destructive"
-      });
-    } finally {
-      setIsSendingReset(false);
-    }
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
 
   if (loading) {
@@ -100,134 +52,107 @@ const Settings = () => {
   }
 
   return (
-    <div className="space-y-6 max-w-4xl">
+    <div className="space-y-8 max-w-4xl">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
-        <p className="text-muted-foreground">Manage your account settings and preferences</p>
+        <h1 className="text-3xl font-bold tracking-tight">Account Settings</h1>
+        <p className="text-muted-foreground mt-2">Manage your account information and preferences</p>
       </div>
 
-      {/* Profile Information */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <User className="w-5 h-5" />
-            Profile Information
+      {/* Profile Overview */}
+      <Card className="border-0 shadow-lg">
+        <CardHeader className="pb-4">
+          <CardTitle className="flex items-center gap-3 text-xl">
+            <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center">
+              <User className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-semibold">{profile.full_name || 'User Account'}</h2>
+              <p className="text-sm text-muted-foreground font-normal">{profile.email}</p>
+            </div>
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center gap-4 p-4 bg-muted/50 rounded-lg">
-            <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-lg">
-                {profile.full_name?.charAt(0) || profile.email?.charAt(0) || 'U'}
-              </span>
-            </div>
-            <div className="flex-1">
-              <h3 className="font-semibold">{profile.full_name || 'No name set'}</h3>
-              <p className="text-sm text-muted-foreground flex items-center gap-1">
-                <Mail className="w-3 h-3" />
-                {profile.email}
-              </p>
-            </div>
-            <Badge className={getAccessLevelColor(profile.access_level)}>
-              <Crown className="w-3 h-3 mr-1" />
-              {profile.access_level}
+        <CardContent className="space-y-6">
+          <div className="flex items-center gap-3">
+            <Badge className={`${getAccessLevelColor(profile.access_level)} text-sm px-3 py-1`}>
+              <Crown className="w-4 h-4 mr-2" />
+              {profile.access_level} PLAN
             </Badge>
-          </div>
-
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="full_name">Full Name</Label>
-              <Input
-                id="full_name"
-                value={profileData.full_name}
-                onChange={(e) => setProfileData(prev => ({ ...prev, full_name: e.target.value }))}
-                placeholder="Enter your full name"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label>Email Address</Label>
-              <Input
-                value={profile.email || ''}
-                disabled
-                className="bg-muted cursor-not-allowed"
-              />
-              <p className="text-xs text-muted-foreground">
-                Email address cannot be changed for security reasons
-              </p>
-            </div>
-          </div>
-
-          <Button 
-            onClick={handleProfileUpdate} 
-            disabled={isUpdating}
-            className="w-full md:w-auto"
-          >
-            {isUpdating ? 'Updating...' : 'Update Profile'}
-          </Button>
-        </CardContent>
-      </Card>
-
-      {/* Account Security */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Account Security</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between p-4 border rounded-lg">
-            <div>
-              <h4 className="font-medium">Password</h4>
-              <p className="text-sm text-muted-foreground">
-                Send a secure password reset link to your email
-              </p>
-            </div>
-            <Button 
-              variant="outline" 
-              onClick={handlePasswordReset}
-              disabled={isSendingReset}
-            >
-              {isSendingReset ? 'Sending...' : 'Reset Password'}
-            </Button>
+            <span className="text-sm text-muted-foreground">
+              {profile.access_level === 'FREE' && 'Basic features available'}
+              {profile.access_level === 'BEGINNER' && 'Enhanced features available'}
+              {profile.access_level === 'PRO' && 'Advanced features available'}
+              {profile.access_level === 'BUSINESS' && 'All features available'}
+            </span>
           </div>
         </CardContent>
       </Card>
 
       {/* Account Information */}
-      <Card>
+      <Card className="border-0 shadow-lg">
         <CardHeader>
-          <CardTitle>Account Information</CardTitle>
+          <CardTitle className="flex items-center gap-2 text-xl">
+            <Calendar className="w-5 h-5 text-blue-600" />
+            Account Information
+          </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-2">
-              <Label>Account Created</Label>
-              <p className="text-sm text-muted-foreground">
-                {new Date(profile.created_at).toLocaleDateString()}
+        <CardContent className="space-y-6">
+          <div className="grid gap-6 md:grid-cols-2">
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 text-sm font-medium text-gray-600">
+                <Calendar className="w-4 h-4" />
+                Account Created
+              </div>
+              <p className="text-lg font-semibold text-gray-900">
+                {formatDate(profile.created_at)}
               </p>
             </div>
-            <div className="space-y-2">
-              <Label>Last Updated</Label>
-              <p className="text-sm text-muted-foreground">
-                {new Date(profile.updated_at).toLocaleDateString()}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 text-sm font-medium text-gray-600">
+                <Clock className="w-4 h-4" />
+                Last Updated
+              </div>
+              <p className="text-lg font-semibold text-gray-900">
+                {formatDate(profile.updated_at)}
               </p>
             </div>
           </div>
 
           <Separator />
           
-          <div className="space-y-2">
-            <Label>Access Level</Label>
-            <div className="flex items-center gap-2">
-              <Badge className={getAccessLevelColor(profile.access_level)}>
-                <Crown className="w-3 h-3 mr-1" />
-                {profile.access_level}
-              </Badge>
-              <span className="text-sm text-muted-foreground">
-                {profile.access_level === 'FREE' && 'Basic features available'}
-                {profile.access_level === 'BEGINNER' && 'Enhanced features available'}
-                {profile.access_level === 'PRO' && 'Advanced features available'}
-                {profile.access_level === 'BUSINESS' && 'All features available'}
-              </span>
+          <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-lg border">
+            <h3 className="font-semibold text-lg mb-2">Subscription Benefits</h3>
+            <div className="grid gap-3 text-sm">
+              {profile.access_level === 'FREE' && (
+                <ul className="space-y-1 text-gray-600">
+                  <li>• 1 AI Prompt storage</li>
+                  <li>• 1 X Account credential</li>
+                  <li>• Basic features access</li>
+                </ul>
+              )}
+              {profile.access_level === 'BEGINNER' && (
+                <ul className="space-y-1 text-gray-600">
+                  <li>• 2 AI Prompt storage</li>
+                  <li>• 2 X Account credentials</li>
+                  <li>• Enhanced features access</li>
+                </ul>
+              )}
+              {profile.access_level === 'PRO' && (
+                <ul className="space-y-1 text-gray-600">
+                  <li>• 5 AI Prompt storage</li>
+                  <li>• 5 X Account credentials</li>
+                  <li>• Advanced features access</li>
+                  <li>• Priority support</li>
+                </ul>
+              )}
+              {profile.access_level === 'BUSINESS' && (
+                <ul className="space-y-1 text-gray-600">
+                  <li>• 10 AI Prompt storage</li>
+                  <li>• 10 X Account credentials</li>
+                  <li>• All features access</li>
+                  <li>• Priority support</li>
+                  <li>• Advanced analytics</li>
+                </ul>
+              )}
             </div>
           </div>
         </CardContent>

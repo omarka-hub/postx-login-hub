@@ -9,6 +9,33 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      ai_prompts: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          prompt: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          prompt: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          prompt?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           access_level: Database["public"]["Enums"]["access_level"]
@@ -33,6 +60,45 @@ export type Database = {
           full_name?: string | null
           id?: string
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      x_credentials: {
+        Row: {
+          access_token: string
+          access_token_secret: string
+          account_name: string
+          api_key: string
+          api_secret_key: string
+          bearer_token: string
+          created_at: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          access_token: string
+          access_token_secret: string
+          account_name: string
+          api_key: string
+          api_secret_key: string
+          bearer_token: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          access_token?: string
+          access_token_secret?: string
+          account_name?: string
+          api_key?: string
+          api_secret_key?: string
+          bearer_token?: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
