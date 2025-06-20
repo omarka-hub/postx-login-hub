@@ -13,6 +13,7 @@ export interface XCredential {
   access_token: string;
   access_token_secret: string;
   bearer_token: string;
+  latest_post: string | null;
   created_at: string;
   updated_at: string;
 }
