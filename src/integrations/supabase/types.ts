@@ -96,6 +96,103 @@ export type Database = {
         }
         Relationships: []
       }
+      schedules: {
+        Row: {
+          ai_prompt_id: string
+          created_at: string
+          end_time_utc: string
+          friday: boolean
+          id: string
+          image_option: boolean
+          last_url: string | null
+          minute_intervals: number
+          monday: boolean
+          name: string
+          rss_feed_id: string
+          saturday: boolean
+          start_time_utc: string
+          sunday: boolean
+          thursday: boolean
+          timezone: string
+          tuesday: boolean
+          updated_at: string
+          user_id: string
+          video_option: boolean
+          wednesday: boolean
+          x_account_id: string
+        }
+        Insert: {
+          ai_prompt_id: string
+          created_at?: string
+          end_time_utc: string
+          friday?: boolean
+          id?: string
+          image_option?: boolean
+          last_url?: string | null
+          minute_intervals: number
+          monday?: boolean
+          name: string
+          rss_feed_id: string
+          saturday?: boolean
+          start_time_utc: string
+          sunday?: boolean
+          thursday?: boolean
+          timezone: string
+          tuesday?: boolean
+          updated_at?: string
+          user_id: string
+          video_option?: boolean
+          wednesday?: boolean
+          x_account_id: string
+        }
+        Update: {
+          ai_prompt_id?: string
+          created_at?: string
+          end_time_utc?: string
+          friday?: boolean
+          id?: string
+          image_option?: boolean
+          last_url?: string | null
+          minute_intervals?: number
+          monday?: boolean
+          name?: string
+          rss_feed_id?: string
+          saturday?: boolean
+          start_time_utc?: string
+          sunday?: boolean
+          thursday?: boolean
+          timezone?: string
+          tuesday?: boolean
+          updated_at?: string
+          user_id?: string
+          video_option?: boolean
+          wednesday?: boolean
+          x_account_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "schedules_ai_prompt_id_fkey"
+            columns: ["ai_prompt_id"]
+            isOneToOne: false
+            referencedRelation: "ai_prompts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "schedules_rss_feed_id_fkey"
+            columns: ["rss_feed_id"]
+            isOneToOne: false
+            referencedRelation: "rss_feeds"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "schedules_x_account_id_fkey"
+            columns: ["x_account_id"]
+            isOneToOne: false
+            referencedRelation: "x_credentials"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       x_credentials: {
         Row: {
           access_token: string
