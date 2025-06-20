@@ -36,6 +36,30 @@ export type Database = {
         }
         Relationships: []
       }
+      dashboard: {
+        Row: {
+          created_at: string
+          current_credits: number
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_credits?: number
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_credits?: number
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           access_level: Database["public"]["Enums"]["access_level"]
@@ -203,6 +227,7 @@ export type Database = {
           bearer_token: string
           created_at: string
           id: string
+          latest_post: string | null
           updated_at: string
           user_id: string
         }
@@ -215,6 +240,7 @@ export type Database = {
           bearer_token: string
           created_at?: string
           id?: string
+          latest_post?: string | null
           updated_at?: string
           user_id: string
         }
@@ -227,6 +253,7 @@ export type Database = {
           bearer_token?: string
           created_at?: string
           id?: string
+          latest_post?: string | null
           updated_at?: string
           user_id?: string
         }
