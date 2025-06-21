@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -414,7 +413,7 @@ const XCredentials = () => {
               <div className="space-y-6">
                 {credentials.map((credential) => (
                   <Card key={credential.id} className="border border-gray-200 hover:shadow-lg transition-all duration-200">
-                    <CardHeader className="pb-3 bg-gradient-to-r from-gray-50 to-blue-50">
+                    <CardHeader className="pb-4 bg-gradient-to-r from-gray-50 to-blue-50">
                       <div className="flex items-start justify-between">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
@@ -438,31 +437,36 @@ const XCredentials = () => {
                       </div>
                     </CardHeader>
                     <CardContent className="pt-4">
-                      <div className="grid gap-3 text-xs">
+                      <div className="space-y-4">
                         {[
-                          { label: 'Bearer Token', value: credential.bearer_token, field: 'bearer_token' },
-                          { label: 'API Key', value: credential.api_key, field: 'api_key' },
-                          { label: 'API Secret', value: credential.api_secret_key, field: 'api_secret_key' },
-                          { label: 'Access Token', value: credential.access_token, field: 'access_token' },
-                          { label: 'Access Token Secret', value: credential.access_token_secret, field: 'access_token_secret' }
-                        ].map(({ label, value, field }) => {
+                          { label: 'Bearer Token', value: credential.bearer_token, field: 'bearer_token', icon: Lock },
+                          { label: 'API Key', value: credential.api_key, field: 'api_key', icon: Key },
+                          { label: 'API Secret', value: credential.api_secret_key, field: 'api_secret_key', icon: Shield },
+                          { label: 'Access Token', value: credential.access_token, field: 'access_token', icon: Key },
+                          { label: 'Access Token Secret', value: credential.access_token_secret, field: 'access_token_secret', icon: Lock }
+                        ].map(({ label, value, field, icon: Icon }) => {
                           const key = `${credential.id}-${field}`;
                           const isVisible = showSecrets[key];
                           return (
-                            <div key={field} className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
-                              <span className="font-medium text-gray-600">{label}:</span>
-                              <div className="flex items-center gap-2">
-                                <code className="text-xs bg-white px-3 py-1 rounded-lg border font-mono">
-                                  {isVisible ? value : maskSecret(value)}
-                                </code>
+                            <div key={field} className="bg-gradient-to-r from-gray-50 to-blue-50 p-4 rounded-xl border border-gray-100">
+                              <div className="flex items-center justify-between mb-2">
+                                <div className="flex items-center gap-2">
+                                  <Icon className="w-4 h-4 text-gray-500" />
+                                  <span className="font-semibold text-gray-700 text-sm">{label}</span>
+                                </div>
                                 <Button
                                   variant="ghost"
                                   size="sm"
                                   onClick={() => toggleShowSecret(credential.id, field)}
-                                  className="h-8 w-8 p-0 hover:bg-gray-200 rounded-lg"
+                                  className="h-6 w-6 p-0 hover:bg-white/50 rounded-lg"
                                 >
                                   {isVisible ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
                                 </Button>
+                              </div>
+                              <div className="bg-white p-3 rounded-lg border shadow-sm">
+                                <code className="text-xs font-mono text-gray-800 break-all leading-relaxed">
+                                  {isVisible ? value : maskSecret(value)}
+                                </code>
                               </div>
                             </div>
                           );
