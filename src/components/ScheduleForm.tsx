@@ -307,7 +307,7 @@ const ScheduleForm: React.FC<ScheduleFormProps> = ({
                 Days of the Week
               </Label>
               <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
-                {DAYS_OF_WEEK.map(day => <div key={day.key} className="bg-gray-50 border border-gray-200 rounded-xl p-3 hover:bg-blue-50 hover:border-blue-200 transition-colors px-[5px]">
+                {DAYS_OF_WEEK.map(day => <div key={day.key} className="bg-gray-50 border border-gray-200 rounded-xl p-3 hover:bg-blue-50 hover:border-blue-200 transition-colors px-[3px]">
                     <div className="flex items-center space-x-3">
                       <Checkbox id={day.key} checked={formData[day.key as keyof typeof formData] as boolean} onCheckedChange={checked => setFormData({
                     ...formData,
