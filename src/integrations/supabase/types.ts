@@ -264,7 +264,36 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      check_duplicate_content: {
+        Args: { schedule_id: string; content_hash: string; hours: number }
+        Returns: {
+          is_duplicate: boolean
+        }[]
+      }
+      get_active_schedules: {
+        Args: { check_time: string }
+        Returns: {
+          id: string
+          name: string
+        }[]
+      }
+      get_and_lock_schedule: {
+        Args: { schedule_id: string }
+        Returns: Json
+      }
+      release_schedule_lock: {
+        Args: { schedule_id: string }
+        Returns: undefined
+      }
+      update_post_records: {
+        Args: {
+          schedule_id: string
+          last_url: string
+          content_hash: string
+          tweet_id: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       access_level: "FREE" | "BEGINNER" | "PRO" | "BUSINESS"
