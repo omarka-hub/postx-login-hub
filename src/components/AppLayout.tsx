@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 import { SidebarProvider, Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar';
@@ -6,6 +5,7 @@ import { LayoutDashboard, Bot, Rss, Settings as SettingsIcon, Twitter, Cpu, LogO
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
+import { useDashboard } from '@/hooks/useDashboard';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
@@ -13,6 +13,7 @@ const AppLayout = () => {
   const location = useLocation();
   const { signOut } = useAuth();
   const { profile } = useProfile();
+  const { dashboard } = useDashboard();
 
   const menuItems = [
     {
@@ -98,7 +99,7 @@ const AppLayout = () => {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-semibold text-gray-900 truncate">
-                        {profile.name || 'User'}
+                        {profile.full_name || 'User'}
                       </p>
                       <p className="text-xs text-gray-600 truncate">
                         {profile.email}
@@ -110,7 +111,7 @@ const AppLayout = () => {
                       {profile.access_level} Plan
                     </Badge>
                     <div className="text-xs text-gray-600">
-                      {profile.credits} credits
+                      {dashboard?.current_credits || 0} credits
                     </div>
                   </div>
                 </div>
