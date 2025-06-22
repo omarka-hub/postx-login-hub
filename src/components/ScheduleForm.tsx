@@ -203,28 +203,27 @@ const ScheduleForm: React.FC<ScheduleFormProps> = ({
     
     const [hours, minutes] = localTime.split(':').map(Number);
     let utcHours = hours - timezoneInfo.offset;
+    let utcMinutes = minutes;
     
     // Handle fractional offsets (like Tehran +3.5)
     if (timezoneInfo.offset % 1 !== 0) {
       const fractionalPart = timezoneInfo.offset % 1;
       const minuteOffset = fractionalPart * 60;
-      let totalMinutes = minutes - minuteOffset;
+      utcMinutes = minutes - minuteOffset;
       
-      if (totalMinutes < 0) {
-        totalMinutes += 60;
+      if (utcMinutes < 0) {
+        utcMinutes += 60;
         utcHours -= 1;
-      } else if (totalMinutes >= 60) {
-        totalMinutes -= 60;
+      } else if (utcMinutes >= 60) {
+        utcMinutes -= 60;
         utcHours += 1;
       }
-      
-      minutes = totalMinutes;
     }
     
     if (utcHours < 0) utcHours += 24;
     if (utcHours >= 24) utcHours -= 24;
     
-    return `${utcHours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+    return `${utcHours.toString().padStart(2, '0')}:${utcMinutes.toString().padStart(2, '0')}`;
   };
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
