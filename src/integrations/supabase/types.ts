@@ -270,6 +270,10 @@ export type Database = {
           is_duplicate: boolean
         }[]
       }
+      decrement: {
+        Args: { val: number }
+        Returns: number
+      }
       get_active_schedules: {
         Args: { check_time: string }
         Returns: {
