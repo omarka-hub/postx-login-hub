@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -103,10 +102,15 @@ const Settings = () => {
 
   if (loading) {
     return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
-          <p className="text-muted-foreground">Loading your account settings...</p>
+      <div className="space-y-8 animate-fade-in">
+        <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-lg border animate-pulse">
+          <div className="h-8 bg-gray-200 rounded w-48 mb-2"></div>
+          <div className="h-5 bg-gray-200 rounded w-96"></div>
+        </div>
+        
+        <div className="space-y-6">
+          <div className="h-64 bg-gray-100 rounded-lg animate-pulse"></div>
+          <div className="h-64 bg-gray-100 rounded-lg animate-pulse"></div>
         </div>
       </div>
     );
@@ -126,14 +130,14 @@ const Settings = () => {
   const planFeatures = getPlanFeatures(profile.access_level);
 
   return (
-    <div className="space-y-8 max-w-4xl">
-      <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-lg border">
+    <div className="space-y-8 max-w-4xl animate-fade-in">
+      <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-lg border animate-scale-in">
         <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">Account Settings</h1>
         <p className="text-lg text-gray-600">Manage your account information and subscription preferences</p>
       </div>
 
       {/* Profile Overview */}
-      <Card className="border-0 shadow-lg bg-gradient-to-br from-white to-gray-50">
+      <Card className="border-0 shadow-lg bg-gradient-to-br from-white to-gray-50 animate-slide-in-right">
         <CardHeader className="pb-4">
           <CardTitle className="flex items-center gap-4 text-xl">
             <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center">
@@ -162,7 +166,7 @@ const Settings = () => {
       </Card>
 
       {/* Account Information */}
-      <Card className="border-0 shadow-lg">
+      <Card className="border-0 shadow-lg animate-slide-in-right" style={{ animationDelay: '0.1s' }}>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-xl">
             <Calendar className="w-6 h-6 text-blue-600" />
@@ -239,7 +243,7 @@ const Settings = () => {
       </Card>
 
       {/* X API Credentials Guide */}
-      <Card className="border-0 shadow-lg bg-gradient-to-br from-white to-blue-50">
+      <Card className="border-0 shadow-lg bg-gradient-to-br from-white to-blue-50 animate-slide-in-right" style={{ animationDelay: '0.2s' }}>
         <CardHeader className="pb-6 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-t-lg">
           <CardTitle className="flex items-center gap-3 text-2xl">
             <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
@@ -303,7 +307,7 @@ const Settings = () => {
                   </div>
                   <div>
                     <span className="font-semibold text-gray-900">Callback URL:</span>
-                    <code className="ml-2 px-2 py-1 bg-blue-100 text-blue-800 rounded text-sm">https://api.postx.cloud</code>
+                    <code className="ml-2 px-2 py-1 bg-blue-100 text-blue-800 rounded text-sm">https://api.postx.cloud/callback</code>
                   </div>
                 </div>
                 <p className="text-sm text-gray-600">
@@ -395,6 +399,83 @@ const Settings = () => {
                 X Developer Support
               </a>
             </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Customer Support Section */}
+      <Card className="border-0 shadow-lg bg-gradient-to-br from-white to-green-50 animate-slide-in-right" style={{ animationDelay: '0.3s' }}>
+        <CardHeader className="pb-6 bg-gradient-to-r from-green-600 to-blue-600 text-white rounded-t-lg">
+          <CardTitle className="flex items-center gap-3 text-2xl">
+            <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+              <User className="w-6 h-6 text-white" />
+            </div>
+            Customer Support
+          </CardTitle>
+          <p className="text-green-100 text-lg">Need help? We're here to assist you with any questions or issues</p>
+        </CardHeader>
+        <CardContent className="p-8 space-y-6">
+          <div className="bg-white p-6 rounded-lg border border-green-200">
+            <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <Globe className="w-5 h-5 text-green-600" />
+              Get in Touch
+            </h3>
+            <p className="text-gray-700 leading-relaxed mb-4">
+              Our support team is ready to help you with any questions about PostX, from setting up your account to troubleshooting technical issues.
+            </p>
+            <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                  <Globe className="w-5 h-5 text-green-600" />
+                </div>
+                <div>
+                  <h4 className="font-semibold text-green-800">Email Support</h4>
+                  <a href="mailto:support@postx.cloud" className="text-green-700 hover:text-green-900 underline font-medium">
+                    support@postx.cloud
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white p-6 rounded-lg border border-blue-200">
+            <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <Clock className="w-5 h-5 text-blue-600" />
+              Response Times
+            </h3>
+            <div className="grid gap-3 md:grid-cols-2">
+              <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                <h4 className="font-semibold text-blue-800 mb-2">General Inquiries</h4>
+                <p className="text-blue-700 text-sm">We typically respond within 24 hours during business days</p>
+              </div>
+              <div className="bg-purple-50 p-4 rounded-lg border border-purple-100">
+                <h4 className="font-semibold text-purple-800 mb-2">Technical Issues</h4>
+                <p className="text-purple-700 text-sm">Priority support for urgent technical problems</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
+            <h3 className="text-xl font-bold text-gray-900 mb-4">Before Contacting Support</h3>
+            <p className="text-gray-700 mb-3">To help us assist you better, please include:</p>
+            <ul className="text-gray-600 space-y-2">
+              <li className="flex items-center gap-2">
+                <Check className="w-4 h-4 text-green-600 flex-shrink-0" />
+                <span>A detailed description of the issue you're experiencing</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <Check className="w-4 h-4 text-green-600 flex-shrink-0" />
+                <span>Steps you've already tried to resolve the problem</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <Check className="w-4 h-4 text-green-600 flex-shrink-0" />
+                <span>Your account email address for verification</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <Check className="w-4 h-4 text-green-600 flex-shrink-0" />
+                <span>Screenshots or error messages (if applicable)</span>
+              </li>
+            </ul>
           </div>
         </CardContent>
       </Card>
