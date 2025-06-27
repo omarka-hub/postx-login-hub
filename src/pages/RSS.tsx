@@ -141,24 +141,30 @@ const RSS = () => {
 
   if (isLoading) {
     return (
-      <div className="space-y-8">
-        <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-lg border">
-          <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">RSS Feeds</h1>
-          <p className="text-lg text-gray-600">Loading your RSS feeds...</p>
+      <div className="space-y-8 animate-fade-in">
+        <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-lg border animate-pulse">
+          <div className="h-8 bg-gray-200 rounded w-48 mb-2"></div>
+          <div className="h-5 bg-gray-200 rounded w-96"></div>
+        </div>
+        
+        <div className="space-y-6">
+          <div className="h-64 bg-gray-100 rounded-lg animate-pulse"></div>
+          <div className="h-64 bg-gray-100 rounded-lg animate-pulse"></div>
+          <div className="h-64 bg-gray-100 rounded-lg animate-pulse"></div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-8">
-      <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-lg border">
+    <div className="space-y-8 animate-fade-in">
+      <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-lg border animate-scale-in">
         <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">RSS Feeds</h1>
         <p className="text-lg text-gray-600">Create and manage your RSS feeds for automated content sourcing</p>
       </div>
 
       {/* Create RSS Feed Section */}
-      <Card className="border-0 shadow-lg bg-gradient-to-br from-white to-gray-50">
+      <Card className="border-0 shadow-lg bg-gradient-to-br from-white to-gray-50 animate-slide-in-right">
         <CardHeader className="pb-4">
           <CardTitle className="flex items-center gap-3 text-xl">
             <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
@@ -211,7 +217,7 @@ const RSS = () => {
       </Card>
 
       {/* Add Existing RSS Feed Section */}
-      <Card className="border-0 shadow-lg bg-gradient-to-br from-white to-blue-50">
+      <Card className="border-0 shadow-lg bg-gradient-to-br from-white to-blue-50 animate-slide-in-right" style={{ animationDelay: '0.1s' }}>
         <CardHeader className="pb-4">
           <CardTitle className="flex items-center gap-3 text-xl">
             <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
@@ -275,7 +281,7 @@ const RSS = () => {
       </Card>
 
       {/* Saved RSS Feeds */}
-      <Card className="border-0 shadow-lg">
+      <Card className="border-0 shadow-lg animate-slide-in-right" style={{ animationDelay: '0.2s' }}>
         <CardHeader className="pb-4">
           <CardTitle className="flex items-center gap-3 text-xl">
             <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
@@ -297,10 +303,11 @@ const RSS = () => {
             </div>
           ) : (
             <div className="space-y-4">
-              {rssFeeds.map((feed) => (
+              {rssFeeds.map((feed, index) => (
                 <div
                   key={feed.id}
-                  className="flex items-center justify-between p-6 border border-gray-200 rounded-xl hover:bg-gradient-to-r hover:from-gray-50 hover:to-blue-50 transition-all duration-200 shadow-sm hover:shadow-md"
+                  className="flex items-center justify-between p-6 border border-gray-200 rounded-xl hover:bg-gradient-to-r hover:from-gray-50 hover:to-blue-50 transition-all duration-200 shadow-sm hover:shadow-md animate-fade-in hover-scale"
+                  style={{ animationDelay: `${index * 0.1}s` }}
                 >
                   <div className="flex-1 space-y-3">
                     <div className="flex items-center gap-3">

@@ -15,10 +15,17 @@ const Dashboard = () => {
 
   if (dashboardLoading || !profile || !dashboard) {
     return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Dashboard</h1>
-          <p className="text-muted-foreground">Loading your dashboard...</p>
+      <div className="space-y-8 animate-fade-in">
+        <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-lg border animate-pulse">
+          <div className="h-8 bg-gray-200 rounded w-48 mb-2"></div>
+          <div className="h-5 bg-gray-200 rounded w-96"></div>
+        </div>
+        
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="lg:col-span-2">
+            <div className="h-24 bg-gray-100 rounded-lg animate-pulse"></div>
+          </div>
+          <div className="h-24 bg-gray-100 rounded-lg animate-pulse"></div>
         </div>
       </div>
     );
@@ -35,13 +42,13 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="space-y-8">
-      <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-lg border">
+    <div className="space-y-8 animate-fade-in">
+      <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-lg border animate-scale-in">
         <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">Dashboard</h1>
         <p className="text-lg text-gray-600">Welcome back! Here's what's happening with your PostX account</p>
       </div>
       
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 animate-slide-in-right">
         {/* Credits Bar */}
         <div className="lg:col-span-2">
           <CreditsBar 
@@ -52,7 +59,7 @@ const Dashboard = () => {
         </div>
         
         {/* Quick Stats */}
-        <Card className="border-0 shadow-lg bg-gradient-to-br from-white to-gray-50">
+        <Card className="border-0 shadow-lg bg-gradient-to-br from-white to-gray-50 hover-scale">
           <CardHeader className="pb-3">
             <CardTitle className="text-lg flex items-center gap-2">
               <Activity className="w-5 h-5 text-blue-600" />
@@ -92,7 +99,7 @@ const Dashboard = () => {
       </div>
 
       {/* Latest Posts */}
-      <div className="w-full">
+      <div className="w-full animate-fade-in" style={{ animationDelay: '0.2s' }}>
         <LatestPosts xCredentials={xCredentials} />
       </div>
     </div>

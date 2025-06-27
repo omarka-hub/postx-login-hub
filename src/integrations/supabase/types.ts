@@ -289,6 +289,10 @@ export type Database = {
         Args: { schedule_id: string }
         Returns: undefined
       }
+      select_for_update: {
+        Args: { table_name: string; user_id: string }
+        Returns: Json[]
+      }
       update_post_records: {
         Args: {
           schedule_id: string

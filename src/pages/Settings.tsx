@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { useProfile } from '@/hooks/useProfile';
-import { User, Crown, Calendar, Clock, Check, Star } from 'lucide-react';
+import { User, Crown, Calendar, Clock, Check, Star, Twitter, ExternalLink, Key, Shield, Globe, Code } from 'lucide-react';
 
 const Settings = () => {
   const { profile, loading } = useProfile();
@@ -233,6 +233,167 @@ const Settings = () => {
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* X API Credentials Guide */}
+      <Card className="border-0 shadow-lg bg-gradient-to-br from-white to-blue-50">
+        <CardHeader className="pb-6 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-t-lg">
+          <CardTitle className="flex items-center gap-3 text-2xl">
+            <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+              <Twitter className="w-6 h-6 text-white" />
+            </div>
+            How to Get Your X (Twitter) API v2 Credentials
+          </CardTitle>
+          <p className="text-blue-100 text-lg">Follow this step-by-step guide to obtain your X API credentials for PostX integration</p>
+        </CardHeader>
+        <CardContent className="p-8 space-y-8">
+          {/* Step 1 */}
+          <div className="flex gap-6">
+            <div className="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+              <span className="text-blue-600 font-bold text-lg">1</span>
+            </div>
+            <div className="space-y-3">
+              <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                <Globe className="w-5 h-5 text-blue-600" />
+                Create a Developer Account
+              </h3>
+              <p className="text-gray-700 leading-relaxed">
+                Visit the <a href="https://developer.twitter.com/en/portal/dashboard" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline font-medium">X Developer Portal</a> and sign up for a developer account. You'll need to provide information about how you plan to use the API.
+              </p>
+            </div>
+          </div>
+
+          {/* Step 2 */}
+          <div className="flex gap-6">
+            <div className="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+              <span className="text-blue-600 font-bold text-lg">2</span>
+            </div>
+            <div className="space-y-3">
+              <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                <Code className="w-5 h-5 text-blue-600" />
+                Create a New App
+              </h3>
+              <p className="text-gray-700 leading-relaxed">
+                Once approved, create a new app in your developer dashboard. Give it a descriptive name like "PostX Integration" and provide a brief description of its purpose.
+              </p>
+            </div>
+          </div>
+
+          {/* Step 3 */}
+          <div className="flex gap-6">
+            <div className="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+              <span className="text-blue-600 font-bold text-lg">3</span>
+            </div>
+            <div className="space-y-3">
+              <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                <Shield className="w-5 h-5 text-blue-600" />
+                Configure App Settings
+              </h3>
+              <div className="space-y-3">
+                <p className="text-gray-700 leading-relaxed">
+                  In your app settings, configure the following URLs:
+                </p>
+                <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 space-y-2">
+                  <div>
+                    <span className="font-semibold text-gray-900">Website URL:</span>
+                    <code className="ml-2 px-2 py-1 bg-blue-100 text-blue-800 rounded text-sm">https://app.postx.cloud</code>
+                  </div>
+                  <div>
+                    <span className="font-semibold text-gray-900">Callback URL:</span>
+                    <code className="ml-2 px-2 py-1 bg-blue-100 text-blue-800 rounded text-sm">https://api.postx.cloud</code>
+                  </div>
+                </div>
+                <p className="text-sm text-gray-600">
+                  <strong>Important:</strong> Make sure to enable "Read and Write" permissions for your app to allow PostX to post tweets on your behalf.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Step 4 */}
+          <div className="flex gap-6">
+            <div className="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+              <span className="text-blue-600 font-bold text-lg">4</span>
+            </div>
+            <div className="space-y-3">
+              <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                <Key className="w-5 h-5 text-blue-600" />
+                Generate Your API Keys
+              </h3>
+              <div className="space-y-3">
+                <p className="text-gray-700 leading-relaxed">
+                  Navigate to the "Keys and tokens" tab in your app settings and generate the following credentials:
+                </p>
+                <div className="grid gap-3 md:grid-cols-2">
+                  <div className="bg-white p-4 rounded-lg border border-gray-200">
+                    <h4 className="font-semibold text-gray-900 mb-2">Consumer Keys</h4>
+                    <ul className="text-sm text-gray-600 space-y-1">
+                      <li>• API Key (Consumer Key)</li>
+                      <li>• API Secret Key (Consumer Secret)</li>
+                    </ul>
+                  </div>
+                  <div className="bg-white p-4 rounded-lg border border-gray-200">
+                    <h4 className="font-semibold text-gray-900 mb-2">Authentication Tokens</h4>
+                    <ul className="text-sm text-gray-600 space-y-1">
+                      <li>• Access Token</li>
+                      <li>• Access Token Secret</li>
+                      <li>• Bearer Token</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Step 5 */}
+          <div className="flex gap-6">
+            <div className="flex-shrink-0 w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+              <Check className="w-5 h-5 text-green-600" />
+            </div>
+            <div className="space-y-3">
+              <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                <ExternalLink className="w-5 h-5 text-green-600" />
+                Add Credentials to PostX
+              </h3>
+              <p className="text-gray-700 leading-relaxed">
+                Copy all the generated credentials and add them to PostX through the X Credentials page. Make sure to keep these credentials secure and never share them publicly.
+              </p>
+            </div>
+          </div>
+
+          {/* Important Notes */}
+          <div className="bg-yellow-50 p-6 rounded-lg border border-yellow-200">
+            <h4 className="font-bold text-yellow-800 mb-3 flex items-center gap-2">
+              <Shield className="w-5 h-5" />
+              Important Security Notes
+            </h4>
+            <ul className="text-yellow-700 space-y-2">
+              <li>• Never share your API credentials with anyone</li>
+              <li>• Store them securely and avoid committing them to version control</li>
+              <li>• Regularly rotate your credentials for enhanced security</li>
+              <li>• Monitor your API usage in the X Developer Portal</li>
+              <li>• Only grant the minimum required permissions</li>
+            </ul>
+          </div>
+
+          {/* Need Help Section */}
+          <div className="bg-blue-50 p-6 rounded-lg border border-blue-200">
+            <h4 className="font-bold text-blue-800 mb-3">Need Help?</h4>
+            <p className="text-blue-700 mb-3">
+              If you encounter any issues while setting up your X API credentials, here are some helpful resources:
+            </p>
+            <div className="space-y-2">
+              <a href="https://developer.twitter.com/en/docs/twitter-api" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-blue-600 hover:text-blue-800 underline">
+                <ExternalLink className="w-4 h-4" />
+                X API Documentation
+              </a>
+              <a href="https://developer.twitter.com/en/support" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-blue-600 hover:text-blue-800 underline">
+                <ExternalLink className="w-4 h-4" />
+                X Developer Support
+              </a>
             </div>
           </div>
         </CardContent>
