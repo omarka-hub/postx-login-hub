@@ -67,7 +67,7 @@ const XCredentials = () => {
           user_id: user.id,
           account_name: formData.account_name.trim(),
           api_key: formData.api_key.trim(),
-          api_secret: formData.api_secret.trim(),
+          api_secret_key: formData.api_secret.trim(),
           access_token: formData.access_token.trim(),
           access_token_secret: formData.access_token_secret.trim(),
           bearer_token: formData.bearer_token.trim()

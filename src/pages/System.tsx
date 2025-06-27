@@ -1,13 +1,13 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ScheduleForm } from '@/components/ScheduleForm';
-import { SchedulesList } from '@/components/SchedulesList';
+import ScheduleForm from '@/components/ScheduleForm';
+import SchedulesList from '@/components/SchedulesList';
 import { useSchedules } from '@/hooks/useSchedules';
 import { Settings, Calendar, Activity } from 'lucide-react';
 
 const System = () => {
-  const { schedules, loading, refreshSchedules } = useSchedules();
+  const { schedules, loading, refetch } = useSchedules();
 
   if (loading) {
     return (
@@ -33,7 +33,7 @@ const System = () => {
       </div>
 
       <div className="animate-slide-in-right">
-        <ScheduleForm onSuccess={refreshSchedules} />
+        <ScheduleForm onSuccess={refetch} />
       </div>
 
       <div className="animate-slide-in-right" style={{ animationDelay: '0.1s' }}>

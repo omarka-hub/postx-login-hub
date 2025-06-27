@@ -11,11 +11,11 @@ import { useAiPrompts } from '@/hooks/useAiPrompts';
 import { useXCredentials } from '@/hooks/useXCredentials';
 
 interface SchedulesListProps {
-  onRefresh: () => void;
+  schedules: Schedule[];
 }
 
-const SchedulesList: React.FC<SchedulesListProps> = ({ onRefresh }) => {
-  const { schedules, loading, deleteSchedule } = useSchedules();
+const SchedulesList: React.FC<SchedulesListProps> = ({ schedules }) => {
+  const { loading, deleteSchedule, refetch } = useSchedules();
   const { rssFeeds } = useRssFeeds();
   const { aiPrompts } = useAiPrompts();
   const { xCredentials } = useXCredentials();
@@ -50,7 +50,7 @@ const SchedulesList: React.FC<SchedulesListProps> = ({ onRefresh }) => {
   const handleDelete = async (id: string) => {
     if (confirm('Are you sure you want to delete this schedule?')) {
       await deleteSchedule(id);
-      onRefresh();
+      refetch();
     }
   };
 
