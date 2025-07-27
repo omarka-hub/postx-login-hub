@@ -37,6 +37,7 @@ const Dashboard = () => {
       case 'BEGINNER': return 150;
       case 'PRO': return 300;
       case 'BUSINESS': return 500;
+      case 'STUDENT': return 500;
       default: return 20;
     }
   };

@@ -5,115 +5,37 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/hooks/useAuth';
+import { useAiPrompts } from '@/hooks/useAiPrompts';
+import { useProfile } from '@/hooks/useProfile';
 import { Trash2, Plus, Bot, Sparkles, Calendar, Activity } from 'lucide-react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-
-interface AIPrompt {
-  id: string;
-  name: string;
-  prompt: string;
-  created_at: string;
-}
 
 const AI = () => {
-  const { user } = useAuth();
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
+  const { aiPrompts, loading, createAiPrompt, deleteAiPrompt, getAccessLimits } = useAiPrompts();
+  const { profile } = useProfile();
   const [promptName, setPromptName] = useState('');
   const [promptText, setPromptText] = useState('');
+  const [isCreating, setIsCreating] = useState(false);
+  const [isDeleting, setIsDeleting] = useState<string | null>(null);
 
-  // Fetch AI prompts
-  const { data: aiPrompts = [], isLoading } = useQuery({
-    queryKey: ['ai-prompts'],
-    queryFn: async () => {
-      if (!user) return [];
-      
-      const { data, error } = await supabase
-        .from('ai_prompts')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
+  const handleSavePrompt = async () => {
+    if (!promptName.trim() || !promptText.trim()) {
+      return;
+    }
 
-      if (error) {
-        console.error('Error fetching AI prompts:', error);
-        throw error;
-      }
-
-      return data as AIPrompt[];
-    },
-    enabled: !!user,
-  });
-
-  // Save AI prompt mutation
-  const savePromptMutation = useMutation({
-    mutationFn: async () => {
-      if (!user || !promptName.trim() || !promptText.trim()) {
-        throw new Error('Please fill in all fields');
-      }
-
-      const { error } = await supabase
-        .from('ai_prompts')
-        .insert({
-          user_id: user.id,
-          name: promptName.trim(),
-          prompt: promptText.trim()
-        });
-
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast({
-        title: "Success",
-        description: "AI prompt saved successfully!",
-      });
-      setPromptName('');
-      setPromptText('');
-      queryClient.invalidateQueries({ queryKey: ['ai-prompts'] });
-    },
-    onError: (error) => {
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to save AI prompt",
-        variant: "destructive",
-      });
-    },
-  });
-
-  // Delete AI prompt mutation
-  const deletePromptMutation = useMutation({
-    mutationFn: async (promptId: string) => {
-      const { error } = await supabase
-        .from('ai_prompts')
-        .delete()
-        .eq('id', promptId);
-
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast({
-        title: "Success",
-        description: "AI prompt deleted successfully!",
-      });
-      queryClient.invalidateQueries({ queryKey: ['ai-prompts'] });
-    },
-    onError: () => {
-      toast({
-        title: "Error",
-        description: "Failed to delete AI prompt",
-        variant: "destructive",
-      });
-    },
-  });
-
-  const handleSavePrompt = () => {
-    savePromptMutation.mutate();
+    setIsCreating(true);
+    await createAiPrompt({
+      name: promptName.trim(),
+      prompt: promptText.trim()
+    });
+    setPromptName('');
+    setPromptText('');
+    setIsCreating(false);
   };
 
-  const handleDeletePrompt = (promptId: string) => {
-    deletePromptMutation.mutate(promptId);
+  const handleDeletePrompt = async (promptId: string) => {
+    setIsDeleting(promptId);
+    await deleteAiPrompt(promptId);
+    setIsDeleting(null);
   };
 
   const formatDate = (dateString: string) => {
@@ -126,7 +48,9 @@ const AI = () => {
     });
   };
 
-  if (isLoading) {
+  const limits = getAccessLimits();
+
+  if (loading) {
     return (
       <div className="space-y-8 animate-fade-in">
         <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-lg border animate-pulse">
@@ -147,6 +71,9 @@ const AI = () => {
       <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-lg border animate-scale-in">
         <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">AI Prompts</h1>
         <p className="text-lg text-gray-600">Create and manage your AI prompts for automated content generation</p>
+        <p className="text-sm text-gray-500 mt-2">
+          {aiPrompts.length}/{limits.maxAiPrompts} prompts used ({profile?.access_level || 'FREE'} plan)
+        </p>
       </div>
 
       {/* Create AI Prompt Section */}
@@ -188,18 +115,25 @@ const AI = () => {
           </div>
           <Button 
             onClick={handleSavePrompt}
-            disabled={savePromptMutation.isPending || !promptName.trim() || !promptText.trim()}
-            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200"
+            disabled={isCreating || !promptName.trim() || !promptText.trim() || aiPrompts.length >= limits.maxAiPrompts}
+            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {savePromptMutation.isPending ? (
+            {isCreating ? (
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                 Saving...
               </div>
+            ) : aiPrompts.length >= limits.maxAiPrompts ? (
+              `Limit Reached (${limits.maxAiPrompts})`
             ) : (
               'Save AI Prompt'
             )}
           </Button>
+          {aiPrompts.length >= limits.maxAiPrompts && (
+            <p className="text-sm text-red-600">
+              You've reached the maximum number of AI prompts for your {profile?.access_level || 'FREE'} plan.
+            </p>
+          )}
         </CardContent>
       </Card>
 
@@ -243,10 +177,14 @@ const AI = () => {
                       variant="ghost"
                       size="sm"
                       onClick={() => handleDeletePrompt(prompt.id)}
-                      disabled={deletePromptMutation.isPending}
+                      disabled={isDeleting === prompt.id}
                       className="text-red-600 hover:text-red-700 hover:bg-red-50 p-3 rounded-lg transition-colors"
                     >
-                      <Trash2 className="w-5 h-5" />
+                      {isDeleting === prompt.id ? (
+                        <div className="w-5 h-5 border-2 border-red-600 border-t-transparent rounded-full animate-spin"></div>
+                      ) : (
+                        <Trash2 className="w-5 h-5" />
+                      )}
                     </Button>
                   </div>
                   <div className="bg-gray-50 p-4 rounded-lg border border-gray-100 mb-3">
