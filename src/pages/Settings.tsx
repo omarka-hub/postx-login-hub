@@ -14,6 +14,7 @@ const Settings = () => {
       case 'BEGINNER': return 'bg-green-100 text-green-800';
       case 'PRO': return 'bg-blue-100 text-blue-800';
       case 'BUSINESS': return 'bg-purple-100 text-purple-800';
+      case 'STUDENT': return 'bg-orange-100 text-orange-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
@@ -90,6 +91,21 @@ const Settings = () => {
             'Priority feature requests'
           ]
         };
+      case 'STUDENT':
+        return {
+          credits: 500,
+          aiPrompts: 2,
+          xAccounts: 1,
+          features: [
+            'Student-friendly automation',
+            'Advanced posting schedules',
+            'Educational resources',
+            'Email support',
+            'Basic analytics',
+            'RSS feed integration',
+            'Learning materials access'
+          ]
+        };
       default:
         return {
           credits: 20,
@@ -160,6 +176,7 @@ const Settings = () => {
               {profile.access_level === 'BEGINNER' && 'Great for growing your social presence'}
               {profile.access_level === 'PRO' && 'Ideal for professional content creators'}
               {profile.access_level === 'BUSINESS' && 'Enterprise-grade automation solution'}
+              {profile.access_level === 'STUDENT' && 'Special pricing for students and educators'}
             </span>
           </div>
         </CardContent>

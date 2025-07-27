@@ -8,7 +8,7 @@ export interface UserProfile {
   id: string;
   full_name: string | null;
   email: string | null;
-  access_level: 'FREE' | 'BEGINNER' | 'PRO' | 'BUSINESS';
+  access_level: 'FREE' | 'BEGINNER' | 'PRO' | 'BUSINESS' | 'STUDENT';
   created_at: string;
   updated_at: string;
 }
