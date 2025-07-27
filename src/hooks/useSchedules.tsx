@@ -147,6 +147,8 @@ export const useSchedules = () => {
         return { maxSchedules: 5, minInterval: 15 };
       case 'BUSINESS':
         return { maxSchedules: 10, minInterval: 5 };
+      case 'STUDENT':
+        return { maxSchedules: 2, minInterval: 30 };
       default:
         return { maxSchedules: 1, minInterval: 60 };
     }
