@@ -4,11 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/hooks/useAuth';
+import { useXCredentials } from '@/hooks/useXCredentials';
+import { useProfile } from '@/hooks/useProfile';
 import { Trash2, Key, Twitter, Plus, Calendar, Activity } from 'lucide-react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface XCredential {
   id: string;
@@ -17,9 +15,8 @@ interface XCredential {
 }
 
 const XCredentials = () => {
-  const { user } = useAuth();
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
+  const { xCredentials, loading, createXCredential, deleteXCredential, getAccessLimits } = useXCredentials();
+  const { profile } = useProfile();
 
   const [formData, setFormData] = useState({
     account_name: '',
@@ -29,109 +26,45 @@ const XCredentials = () => {
     access_token_secret: '',
     bearer_token: ''
   });
+  const [isCreating, setIsCreating] = useState(false);
+  const [isDeleting, setIsDeleting] = useState<string | null>(null);
 
-  // Fetch X credentials
-  const { data: xCredentials = [], isLoading } = useQuery({
-    queryKey: ['x-credentials'],
-    queryFn: async () => {
-      if (!user) return [];
-      
-      const { data, error } = await supabase
-        .from('x_credentials')
-        .select('id, account_name, created_at')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
+  const handleSaveCredentials = async () => {
+    if (!formData.account_name.trim() || !formData.api_key.trim() || 
+        !formData.api_secret.trim() || !formData.access_token.trim() || 
+        !formData.access_token_secret.trim() || !formData.bearer_token.trim()) {
+      return;
+    }
 
-      if (error) {
-        console.error('Error fetching X credentials:', error);
-        throw error;
-      }
-
-      return data as XCredential[];
-    },
-    enabled: !!user,
-  });
-
-  // Save X credentials mutation
-  const saveCredentialsMutation = useMutation({
-    mutationFn: async () => {
-      if (!user || !formData.account_name.trim() || !formData.api_key.trim() || 
-          !formData.api_secret.trim() || !formData.access_token.trim() || 
-          !formData.access_token_secret.trim() || !formData.bearer_token.trim()) {
-        throw new Error('Please fill in all fields');
-      }
-
-      const { error } = await supabase
-        .from('x_credentials')
-        .insert({
-          user_id: user.id,
-          account_name: formData.account_name.trim(),
-          api_key: formData.api_key.trim(),
-          api_secret_key: formData.api_secret.trim(),
-          access_token: formData.access_token.trim(),
-          access_token_secret: formData.access_token_secret.trim(),
-          bearer_token: formData.bearer_token.trim()
-        });
-
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast({
-        title: "Success",
-        description: "X credentials saved successfully!",
-      });
-      setFormData({
-        account_name: '',
-        api_key: '',
-        api_secret: '',
-        access_token: '',
-        access_token_secret: '',
-        bearer_token: ''
-      });
-      queryClient.invalidateQueries({ queryKey: ['x-credentials'] });
-    },
-    onError: (error) => {
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to save X credentials",
-        variant: "destructive",
-      });
-    },
-  });
-
-  // Delete X credentials mutation
-  const deleteCredentialsMutation = useMutation({
-    mutationFn: async (credentialId: string) => {
-      const { error } = await supabase
-        .from('x_credentials')
-        .delete()
-        .eq('id', credentialId);
-
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast({
-        title: "Success",
-        description: "X credentials deleted successfully!",
-      });
-      queryClient.invalidateQueries({ queryKey: ['x-credentials'] });
-    },
-    onError: () => {
-      toast({
-        title: "Error",
-        description: "Failed to delete X credentials",
-        variant: "destructive",
-      });
-    },
-  });
-
-  const handleSaveCredentials = () => {
-    saveCredentialsMutation.mutate();
+    setIsCreating(true);
+    await createXCredential({
+      account_name: formData.account_name.trim(),
+      api_key: formData.api_key.trim(),
+      api_secret_key: formData.api_secret.trim(),
+      access_token: formData.access_token.trim(),
+      access_token_secret: formData.access_token_secret.trim(),
+      bearer_token: formData.bearer_token.trim(),
+      latest_post: null
+    });
+    setFormData({
+      account_name: '',
+      api_key: '',
+      api_secret: '',
+      access_token: '',
+      access_token_secret: '',
+      bearer_token: ''
+    });
+    setIsCreating(false);
   };
 
-  const handleDeleteCredentials = (credentialId: string) => {
-    deleteCredentialsMutation.mutate(credentialId);
+  const handleDeleteCredentials = async (credentialId: string) => {
+    setIsDeleting(credentialId);
+    await deleteXCredential(credentialId);
+    setIsDeleting(null);
   };
+
+  const limits = getAccessLimits();
+  const isLoading = loading;
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -164,6 +97,9 @@ const XCredentials = () => {
       <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-lg border animate-scale-in">
         <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">X Credentials</h1>
         <p className="text-lg text-gray-600">Manage your X (Twitter) API credentials for automated posting</p>
+        <p className="text-sm text-gray-500 mt-2">
+          {xCredentials.length}/{limits.maxXAccounts} X account{limits.maxXAccounts === 1 ? '' : 's'} used ({profile?.access_level || 'FREE'} plan)
+        </p>
       </div>
 
       {/* Add X Credentials Section */}
@@ -264,18 +200,25 @@ const XCredentials = () => {
           </div>
           <Button 
             onClick={handleSaveCredentials}
-            disabled={saveCredentialsMutation.isPending || Object.values(formData).some(val => !val.trim())}
-            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200"
+            disabled={isCreating || Object.values(formData).some(val => !val.trim()) || xCredentials.length >= limits.maxXAccounts}
+            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {saveCredentialsMutation.isPending ? (
+            {isCreating ? (
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                 Saving...
               </div>
+            ) : xCredentials.length >= limits.maxXAccounts ? (
+              `Limit Reached (${limits.maxXAccounts})`
             ) : (
               'Save X Credentials'
             )}
           </Button>
+          {xCredentials.length >= limits.maxXAccounts && (
+            <p className="text-sm text-red-600">
+              You've reached the maximum number of X accounts for your {profile?.access_level || 'FREE'} plan.
+            </p>
+          )}
         </CardContent>
       </Card>
 
@@ -324,10 +267,14 @@ const XCredentials = () => {
                     variant="ghost"
                     size="sm"
                     onClick={() => handleDeleteCredentials(credential.id)}
-                    disabled={deleteCredentialsMutation.isPending}
+                    disabled={isDeleting === credential.id}
                     className="text-red-600 hover:text-red-700 hover:bg-red-50 p-3 rounded-lg transition-colors"
                   >
-                    <Trash2 className="w-5 h-5" />
+                    {isDeleting === credential.id ? (
+                      <div className="w-5 h-5 border-2 border-red-600 border-t-transparent rounded-full animate-spin"></div>
+                    ) : (
+                      <Trash2 className="w-5 h-5" />
+                    )}
                   </Button>
                 </div>
               ))}

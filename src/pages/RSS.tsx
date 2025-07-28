@@ -5,11 +5,9 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/hooks/useAuth';
+import { useRssFeeds } from '@/hooks/useRssFeeds';
+import { useProfile } from '@/hooks/useProfile';
 import { Trash2, ExternalLink, Rss, Plus, Globe, Database, Calendar, Activity } from 'lucide-react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface RSSFeed {
   id: string;
@@ -21,9 +19,8 @@ interface RSSFeed {
 }
 
 const RSS = () => {
-  const { user } = useAuth();
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
+  const { rssFeeds, loading, createRssFeed, deleteRssFeed, getAccessLimits } = useRssFeeds();
+  const { profile } = useProfile();
 
   // Form states for creating RSS feed
   const [createFeedName, setCreateFeedName] = useState('');
@@ -34,100 +31,35 @@ const RSS = () => {
   const [existingFeedName, setExistingFeedName] = useState('');
   const [existingRssUrl, setExistingRssUrl] = useState('');
   const [existingIsXSource, setExistingIsXSource] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
+  const [isDeleting, setIsDeleting] = useState<string | null>(null);
 
-  // Fetch RSS feeds
-  const { data: rssFeeds = [], isLoading } = useQuery({
-    queryKey: ['rss-feeds'],
-    queryFn: async () => {
-      if (!user) return [];
-      
-      const { data, error } = await supabase
-        .from('rss_feeds')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
+  const handleSaveExistingFeed = async () => {
+    if (!existingFeedName.trim() || !existingRssUrl.trim()) {
+      return;
+    }
 
-      if (error) {
-        console.error('Error fetching RSS feeds:', error);
-        throw error;
-      }
-
-      return data as RSSFeed[];
-    },
-    enabled: !!user,
-  });
-
-  // Save existing RSS feed mutation
-  const saveExistingFeedMutation = useMutation({
-    mutationFn: async () => {
-      if (!user || !existingFeedName.trim() || !existingRssUrl.trim()) {
-        throw new Error('Please fill in all required fields');
-      }
-
-      const { error } = await supabase
-        .from('rss_feeds')
-        .insert({
-          user_id: user.id,
-          name: existingFeedName.trim(),
-          url: existingRssUrl.trim(),
-          is_x_source: existingIsXSource,
-          feed_type: 'existing'
-        });
-
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast({
-        title: "Success",
-        description: "RSS feed saved successfully!",
-      });
-      setExistingFeedName('');
-      setExistingRssUrl('');
-      setExistingIsXSource(false);
-      queryClient.invalidateQueries({ queryKey: ['rss-feeds'] });
-    },
-    onError: (error) => {
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to save RSS feed",
-        variant: "destructive",
-      });
-    },
-  });
-
-  // Delete RSS feed mutation
-  const deleteFeedMutation = useMutation({
-    mutationFn: async (feedId: string) => {
-      const { error } = await supabase
-        .from('rss_feeds')
-        .delete()
-        .eq('id', feedId);
-
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast({
-        title: "Success",
-        description: "RSS feed deleted successfully!",
-      });
-      queryClient.invalidateQueries({ queryKey: ['rss-feeds'] });
-    },
-    onError: () => {
-      toast({
-        title: "Error",
-        description: "Failed to delete RSS feed",
-        variant: "destructive",
-      });
-    },
-  });
-
-  const handleSaveExistingFeed = () => {
-    saveExistingFeedMutation.mutate();
+    setIsCreating(true);
+    await createRssFeed({
+      name: existingFeedName.trim(),
+      url: existingRssUrl.trim(),
+      is_x_source: existingIsXSource,
+      feed_type: 'existing'
+    });
+    setExistingFeedName('');
+    setExistingRssUrl('');
+    setExistingIsXSource(false);
+    setIsCreating(false);
   };
 
-  const handleDeleteFeed = (feedId: string) => {
-    deleteFeedMutation.mutate(feedId);
+  const handleDeleteFeed = async (feedId: string) => {
+    setIsDeleting(feedId);
+    await deleteRssFeed(feedId);
+    setIsDeleting(null);
   };
+
+  const limits = getAccessLimits();
+  const isLoading = loading;
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -161,6 +93,9 @@ const RSS = () => {
       <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-lg border animate-scale-in">
         <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">RSS Feeds</h1>
         <p className="text-lg text-gray-600">Create and manage your RSS feeds for automated content sourcing</p>
+        <p className="text-sm text-gray-500 mt-2">
+          {rssFeeds.length}/{limits.maxRssFeeds} RSS feeds used ({profile?.access_level || 'FREE'} plan)
+        </p>
       </div>
 
       {/* Create RSS Feed Section */}
@@ -265,18 +200,25 @@ const RSS = () => {
           </div>
           <Button 
             onClick={handleSaveExistingFeed}
-            disabled={saveExistingFeedMutation.isPending || !existingFeedName.trim() || !existingRssUrl.trim()}
-            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200"
+            disabled={isCreating || !existingFeedName.trim() || !existingRssUrl.trim() || rssFeeds.length >= limits.maxRssFeeds}
+            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {saveExistingFeedMutation.isPending ? (
+            {isCreating ? (
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                 Saving...
               </div>
+            ) : rssFeeds.length >= limits.maxRssFeeds ? (
+              `Limit Reached (${limits.maxRssFeeds})`
             ) : (
               'Save RSS Feed'
             )}
           </Button>
+          {rssFeeds.length >= limits.maxRssFeeds && (
+            <p className="text-sm text-red-600">
+              You've reached the maximum number of RSS feeds for your {profile?.access_level || 'FREE'} plan.
+            </p>
+          )}
         </CardContent>
       </Card>
 
@@ -337,10 +279,14 @@ const RSS = () => {
                     variant="ghost"
                     size="sm"
                     onClick={() => handleDeleteFeed(feed.id)}
-                    disabled={deleteFeedMutation.isPending}
+                    disabled={isDeleting === feed.id}
                     className="text-red-600 hover:text-red-700 hover:bg-red-50 p-3 rounded-lg transition-colors"
                   >
-                    <Trash2 className="w-5 h-5" />
+                    {isDeleting === feed.id ? (
+                      <div className="w-5 h-5 border-2 border-red-600 border-t-transparent rounded-full animate-spin"></div>
+                    ) : (
+                      <Trash2 className="w-5 h-5" />
+                    )}
                   </Button>
                 </div>
               ))}

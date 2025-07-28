@@ -4,10 +4,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import ScheduleForm from '@/components/ScheduleForm';
 import SchedulesList from '@/components/SchedulesList';
 import { useSchedules } from '@/hooks/useSchedules';
+import { useProfile } from '@/hooks/useProfile';
 import { Settings, Calendar, Activity } from 'lucide-react';
 
 const System = () => {
-  const { schedules, loading, refetch } = useSchedules();
+  const { schedules, loading, refetch, getAccessLimits } = useSchedules();
+  const { profile } = useProfile();
+  
+  const limits = getAccessLimits();
 
   if (loading) {
     return (
@@ -30,6 +34,9 @@ const System = () => {
       <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-lg border animate-scale-in">
         <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">System Schedules</h1>
         <p className="text-lg text-gray-600">Create and manage your automated posting schedules</p>
+        <p className="text-sm text-gray-500 mt-2">
+          {schedules.length}/{limits.maxSchedules} schedules used ({profile?.access_level || 'FREE'} plan)
+        </p>
       </div>
 
       <div className="animate-slide-in-right">
