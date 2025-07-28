@@ -114,11 +114,11 @@ export const useAiPrompts = () => {
       case 'FREE':
         return { maxAiPrompts: 1 };
       case 'BEGINNER':
-        return { maxAiPrompts: 3 };
+        return { maxAiPrompts: 2 };
       case 'PRO':
-        return { maxAiPrompts: 10 };
+        return { maxAiPrompts: 5 };
       case 'BUSINESS':
-        return { maxAiPrompts: 20 };
+        return { maxAiPrompts: 10 };
       case 'STUDENT':
         return { maxAiPrompts: 2 };
       default:

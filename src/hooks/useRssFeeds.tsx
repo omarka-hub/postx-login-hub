@@ -116,11 +116,11 @@ export const useRssFeeds = () => {
       case 'FREE':
         return { maxRssFeeds: 1 };
       case 'BEGINNER':
-        return { maxRssFeeds: 3 };
+        return { maxRssFeeds: 2 };
       case 'PRO':
-        return { maxRssFeeds: 10 };
+        return { maxRssFeeds: 5 };
       case 'BUSINESS':
-        return { maxRssFeeds: 20 };
+        return { maxRssFeeds: 10 };
       case 'STUDENT':
         return { maxRssFeeds: 2 };
       default:
