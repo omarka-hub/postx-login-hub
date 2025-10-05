@@ -18,7 +18,7 @@ const Dashboard = () => {
       <div className="space-y-8 animate-fade-in">
         <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-lg border animate-pulse">
           <div className="h-8 bg-gray-200 rounded w-48 mb-2"></div>
-          <div className="h-5 bg-blue-200 rounded w-96"></div>
+          <div className="h-5 bg-gray-200 rounded w-96"></div>
         </div>
         
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
