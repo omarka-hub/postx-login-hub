@@ -46,7 +46,7 @@ const Dashboard = () => {
     <div className="space-y-8 animate-fade-in">
       <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-lg border animate-scale-in">
         <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">Dashboard</h1>
-        <p className="text-lg text-blue-900">Welcome back! Here's what's happening with your PostX account</p>
+        <p className="text-lg text-blue-100">Welcome back! Here's what's happening with your PostX account</p>
       </div>
       
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 animate-slide-in-right">
