@@ -23,7 +23,7 @@ const Dashboard = () => {
         
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           <div className="lg:col-span-2">
-            <div className="h-24 bg-blue-100 rounded-lg animate-pulse"></div>
+            <div className="h-24 bg-gray-100 rounded-lg animate-pulse"></div>
           </div>
           <div className="h-24 bg-gray-100 rounded-lg animate-pulse"></div>
         </div>
